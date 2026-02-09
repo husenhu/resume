@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acep Husen - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Portfolio Grid - Mobile First */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Thumbnail Hover Effect */
+        .portfolio-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .portfolio-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Overlay on hover */
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(29, 78, 216, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        
+        .portfolio-overlay-icon {
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Lightbox Styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .lightbox-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* Navigation arrows for lightbox */
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .lightbox-nav:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .lightbox-prev {
+            left: 1rem;
+        }
+        
+        .lightbox-next {
+            right: 1rem;
+        }
+        
+        /* Image counter */
+        .lightbox-counter {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 0.875rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Navigation Bar -->
+    <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-700 to-blue-800 text-white py-3 px-6 shadow-lg z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold flex items-center gap-2 hover:text-blue-100 transition">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Resume</span>
+            </a>
+            <div class="font-bold flex items-center gap-2">
+                <i class="fas fa-images"></i>
+                <span>Portfolio</span>
+            </div>
+            <div class="w-10"></div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-6 pt-24 md:pt-20 pb-12">
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-700 to-blue-800 text-white rounded-2xl p-6 md:p-12 mb-12 relative overflow-hidden shadow-xl">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-blue-600 opacity-10 rounded-full -translate-y-20 translate-x-20"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-500 opacity-10 rounded-full translate-y-16 -translate-x-16"></div>
+            
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">My Portfolio</h1>
+                <p class="text-blue-100 text-lg md:text-xl max-w-2xl leading-relaxed">
+                    Showcasing projects and work samples from my professional experience. Click on any thumbnail to view the full image.
+                </p>
+            </div>
+        </div>
+
+        <!-- Portfolio Grid -->
+        <div class="portfolio-grid">
+            <!-- Portfolio Items will be generated by JavaScript -->
+        </div>
+
+        <!-- Empty State (just in case) -->
+        <div id="emptyState" class="text-center py-20" style="display: none;">
+            <i class="fas fa-image text-gray-300 text-6xl mb-4"></i>
+            <p class="text-gray-500 text-lg">No portfolio images found</p>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <button class="lightbox-nav lightbox-prev" onclick="prevImage()" title="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <img id="lightboxImage" src="" alt="Portfolio Image" class="lightbox-image">
+            <button class="lightbox-nav lightbox-next" onclick="nextImage()" title="Next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="lightbox-counter">
+                <span id="currentImageNumber">1</span> / <span id="totalImageNumber">21</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Portfolio Images Data
+        const portfolioImages = [
+            'img/portfolio (1).png',
+            'img/portfolio (2).png',
+            'img/portfolio (3).png',
+            'img/portfolio (4).png',
+            'img/portfolio (5).png',
+            'img/portfolio (6).png',
+            'img/portfolio (7).png',
+            'img/portfolio (8).png',
+            'img/portfolio (9).png',
+            'img/portfolio (10).png',
+            'img/portfolio (11).png',
+            'img/portfolio (12).png',
+            'img/portfolio (13).png',
+            'img/portfolio (14).png',
+            'img/portfolio (15).png',
+            'img/portfolio (16).png',
+            'img/portfolio (17).png',
+            'img/portfolio (18).png',
+            'img/portfolio (19).png',
+            'img/portfolio (20).png',
+            'img/portfolio (21).png'
+        ];
+
+        let currentImageIndex = 0;
+
+        // Initialize Portfolio Grid
+        function initPortfolio() {
+            const grid = document.querySelector('.portfolio-grid');
+            
+            if (portfolioImages.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            portfolioImages.forEach((image, index) => {
+                const item = document.createElement('div');
+                item.className = 'portfolio-item group';
+                item.innerHTML = `
+                    <img src="${image}" alt="Portfolio ${index + 1}" loading="lazy">
+                    <div class="portfolio-overlay">
+                        <i class="fas fa-search-plus portfolio-overlay-icon"></i>
+                    </div>
+                `;
+                item.onclick = () => openLightbox(index);
+                grid.appendChild(item);
+            });
+
+            document.getElementById('totalImageNumber').textContent = portfolioImages.length;
+        }
+
+        // Lightbox Functions
+        function openLightbox(index) {
+            currentImageIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const image = document.getElementById('lightboxImage');
+            image.src = portfolioImages[index];
+            lightbox.classList.add('active');
+            updateImageCounter();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % portfolioImages.length;
+            document.getElementById('lightboxImage').src = portfolioImages[currentImageIndex];
+            updateImageCounter();
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + portfolioImages.length) % portfolioImages.length;
+            document.getElementById('lightboxImage').src = portfolioImages[currentImageIndex];
+            updateImageCounter();
+        }
+
+        function updateImageCounter() {
+            document.getElementById('currentImageNumber').textContent = currentImageIndex + 1;
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('active')) return;
+            
+            if (e.key === 'ArrowRight') nextImage();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // Close lightbox when clicking outside image
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') {
+                closeLightbox();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initPortfolio);
+    </script>
+</body>
+</html>
